@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 import sys
 from dotenv import load_dotenv 
+from corsheaders.defaults import default_headers
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,7 +41,28 @@ SECRET_KEY =  os.getenv("SECRET_KEY")
 DEBUG = # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [ 
+		'localhost', 
+		'127.0.0.1',  
+]
+# CORS Config
+CORS_ALLOW_HEADERS = list(default_headers) + [
+	'X-Register',
+] 
+
+CORS_ORIGIN_ALLOW_ALL = True  
+# CORS_ORIGIN_ALLOW_ALL como True, o que permite que qualquer site acesse seus recursos.
+# Defina como False e adicione o site no CORS_ORIGIN_WHITELIST onde somente o site da lista acesse os seus recursos.
+
+CORS_ALLOW_CREDENTIALS = False 
+
+CORS_ORIGIN_WHITELIST = ['http://meusite.com',] # Lista. 
+
+if not DEBUG:
+	SECURE_SSL_REDIRECT = True
+	ADMINS = [(os.getenv('SUPER_USER'), os.getenv('EMAIL'))]
+	SESSION_COOKIE_SECURE = True
+	CSRF_COOKIE_SECURE = True 
 
 
 # Application definition
@@ -56,7 +78,7 @@ INSTALLED_APPS = [
 
 
 THIRD_APPS = [ # são as Lib/app que instalamos no projeto
-    #... # update 11/03/2024 - removido esses ...
+    "corsheaders", 
 ]
 
 PROJECT_APPS = [ # são os apps que criamos no projeto 
@@ -66,7 +88,8 @@ PROJECT_APPS = [ # são os apps que criamos no projeto
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",    
+    'corsheaders.middleware.CorsMiddleware', # CORS
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
